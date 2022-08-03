@@ -1,42 +1,30 @@
-import { useState } from 'react';
-import { _url } from '../../helpers/url';
+import { _url } from "../../helpers/url";
+import useHttp from "../hooks/use-http";
 
-import Section from '../UI/Section';
-import TaskForm from './TaskForm';
+import Section from "../UI/Section";
+import TaskForm from "./TaskForm";
 
 const NewTask = (props) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const { isLoading, error, sendRequest: sendTaskRequest } = useHttp();
 
   const enterTaskHandler = async (taskText) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const response = await fetch(
-        _url,
-        {
-          method: 'POST',
-          body: JSON.stringify({ text: taskText }),
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error('Request failed!');
-      }
-
-      const data = await response.json();
-
-      const generatedId = data.name; // firebase-specific => "name" contains generated id
+    const createdTask = (taskData) => {
+      const generatedId = taskData.name; // firebase-specific => "name" contains generated id
       const createdTask = { id: generatedId, text: taskText };
-
       props.onAddTask(createdTask);
-    } catch (err) {
-      setError(err.message || 'Something went wrong!');
-    }
-    setIsLoading(false);
+    };
+
+    sendTaskRequest(
+      {
+        url: _url,
+        method: "POST",
+        body: { text: taskText },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+      createdTask
+    );
   };
 
   return (
