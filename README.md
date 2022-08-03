@@ -1,1 +1,1 @@
-- Here I've been training a simple custom hook with 2 counters
+- Here I've been creating a custom useHttp hook. And using FirebaseAPI
